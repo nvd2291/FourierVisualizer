@@ -52,7 +52,7 @@ def generate_data():
 
     thisFourier.set_amplitude(float(amplitudeEntry.get()))
     thisFourier.set_offset(float(offsetEntry.get()))
-    thisFourier.set_frequency(float(frequencyEntry.get()) * 1e3)
+    thisFourier.set_frequency((float(frequencyEntry.get()) * 1e3))
 
     if signalType >= 0 and signalType < 4:
         thisFourier.generate_time_domain_data(sigTypesCombo.get())
@@ -62,16 +62,52 @@ def generate_data():
         thisFourier.construct_triangle_wave_from_sines(numHarmonics)
 
     thisFourier.generate_freq_domain_data()
+
+def plot_data():
+    generate_data()
+    [time_axis, signal_data] = thisFourier.get_time_domain_data()
+    [fft_bins, fft_magnitude] = thisFourier.get_fft_domain_data()
+
+    frequency = thisFourier.get_freq()
+    fs = thisFourier.get_fs()
+    amplitude = thisFourier.get_amplitude()
+    window_name  = thisFourier.get_window_type().capitalize()
+    ax[0].clear()
+    ax[1].clear()
+
+    ax[0].plot(time_axis, signal_data)
+    ax[0].set_title(f"Time Domain Data: Frequency: {frequency}kHz, Sampling Frequency: {fs}kHz, Amplitude: {amplitude}")
+    ax[0].set_xlim(min(time_axis), max(time_axis))
+    ax[0].set_ylabel('Units')
+    ax[0].set_xlabel('Seconds')
+    ax[0].grid(True, 'both')
+
+    ax[1].semilogx(fft_bins, fft_magnitude)
+    if thisFourier.get_window_state():
+        ax[1].set_title(f"FFT Plot: Frequency: {frequency}kHz, Sampling Frequency: {fs}KHz, FFT Window: {window_name}")
+    else:
+        ax[1].set_title(f"FFT Plot: Frequency: {frequency}kHz, Sampling Frequency: {fs}KHz, FFT Window: No Window")
+    ax[1].set_xlim(min(fft_bins), max(fft_bins))
+    ax[1].set_ylabel('Magnitude [dBFS]')
+    ax[1].set_xlabel('Frequency [Hz]')
+    ax[1].grid(True, 'both')
+
+    dataCanvas.draw()
+
     
+
+
 #Initialize the FourierObject
 thisFourier = fourierObj.FourierDataObject()
 # Create the tkinter Window
 window = tk.Tk()
 # window.geometry("1200x1000")
 window.title("Fourier Visualizer Tool")
+window.grid_columnconfigure(0, weight = 1)
+window.grid_rowconfigure(0, weight = 0)
 
 #Create the OptionsFrame
-optionsFrame = ttk.Frame(window, height = 800, width = 200)
+optionsFrame = ttk.Frame(window, height = window.winfo_height() - 20, width = window.winfo_width() - 20)
 optionsFrame['borderwidth'] = 5
 optionsFrame['relief'] = 'groove'
 
@@ -171,21 +207,24 @@ harmonicsEntry.bind('<FocusOut>', isEntryNumerical)
 harmonicsEntry.name = "harmonics"
 harmonicsEntry.grid(row = 8, column = 1, padx = 10, pady= 10)
 
-optionsFrame.pack(side = 'left', padx = 10, pady = 10)
+optionsFrame.pack(side = 'left', padx = 10, pady = 10, expand = True, fill = "both")
 
 #Setup the display frame
-displayFrame = ttk.Frame(window, height = 800, width = 800)
+displayFrame = ttk.Frame(window, height =  window.winfo_height() - 20, width = window.winfo_width() - 20)
 displayFrame['borderwidth'] = 5
 displayFrame['relief'] = 'groove'
 
 displayFrameLabel = ttk.Label(displayFrame, text = "Signal Data", font = "Helvetica 24")
-displayFrameLabel.grid(row = 0, column = 0, padx = 10, pady = 10)
+displayFrameLabel.grid(row = 0, column = 0, padx = 10, pady = 10, sticky = 'n')
 
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(2, 1)
 dataCanvas = FigureCanvasTkAgg(fig, master = displayFrame)
-dataCanvas.get_tk_widget().grid(row = 1, padx = 10, pady = 10)
+dataCanvas.get_tk_widget().grid(row = 1, padx = 10, pady = 10, stick = 'nsew')
 
-displayFrame.pack(side = 'right', padx = 10, pady = 10)
+displayFrame.grid_columnconfigure(0, weight = 1)
+displayFrame.grid_rowconfigure(1 , weight = 1)
+displayFrame.pack(side = 'right', padx = 10, pady = 10, expand = True, fill = "both")
 
-generate_data()
+plotButton = ttk.Button(optionsFrame, text = "Generate Plot", command = plot_data)
+plotButton.grid(row = 9, columnspan = 2, padx = 10, pady = 10)
 window.mainloop()

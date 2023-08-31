@@ -42,12 +42,6 @@ class FourierDataObject():
 
     def __init__(self, signal_frequency = 1e3, sample_frequency= 1e6, amplitude = 1.0, duty_cycle = 0.5, dc_offset = 0.0):
 
-        #Default Values
-        self.__time_axis_data = []
-        self.__signal_data = []
-        self.__fft_data_raw = []
-        self.__fft_magnitude = []
-        self.__fft_bins = []
         # self.__input_data = []
         self.__curr_sig_type =  self.__signal_types[0]
         self.__curr_noise_type = self.__noise_types[0]
@@ -71,6 +65,12 @@ class FourierDataObject():
         self.calc_sample_period()
         self.calc_num_samples()
 
+        #Default Values
+        self.generate_time_axis()
+        self.__signal_data = np.zeros(len(self.__time_axis_data))
+        self.__fft_data_raw = []
+        self.__fft_magnitude = []
+        self.__fft_bins = []
   
     def __repr__(cls) -> str:
         return cls.__name
@@ -288,6 +288,22 @@ class FourierDataObject():
             cls.generate_noise_data()
             cls.__signal_data += cls.noise_data
 
+    def fft_window_data(cls):
+            
+        if cls.__curr_window_type == 'blackmanharris4':
+            return signal.get_window('blackmanharris', cls.__num_samples)
+
+        elif cls.__curr_window_type == 'blackmanharris7':
+            return blackmanharris7(cls.__num_samples)
+        
+        elif cls.__curr_window_type == 'hanning':
+            return signal.get_window('hann', cls.__num_samples)
+
+        else:
+            return signal.get_window(cls.__curr_window_type, cls.__num_samples)
+    
+        print('ERROR: Unexpected Window type detected') 
+
     def generate_freq_domain_data(cls, is_windowed: Optional[bool] = None):
 
         # Calculate the size of the frequency bins
@@ -341,29 +357,29 @@ class FourierDataObject():
         else:
             print('ERROR: Unexpected Noise type detected') 
 
-
-    def fft_window_data(cls):
-            
-        if cls.__curr_window_type == 'blackmanharris4':
-            return signal.get_window('blackmanharris', cls.__num_samples)
-
-        elif cls.__curr_window_type == 'blackmanharris7':
-            return blackmanharris7(cls.__num_samples)
-        
-        elif cls.__curr_window_type == 'hanning':
-            return signal.get_window('hann', cls.__num_samples)
-
-        else:
-            return signal.get_window(cls.__curr_window_type, cls.__num_samples)
-    
-        print('ERROR: Unexpected Window type detected') 
-
     def get_time_domain_data(cls):
         return [cls.__time_axis_data, cls.__signal_data]
 
     def get_fft_domain_data(cls):
         return [cls.__fft_bins, cls.__fft_magnitude]
 
+    def get_freq(cls):
+        return cls.__signal_frequency
+
+    def get_fs(cls):
+        return cls.__sample_frequency
+    
+    def get_amplitude(cls):
+        return cls.__amplitude
+
+    def get_noise_magnitude(cls):
+        return cls.__max_noise
+
+    def get_window_type(cls):
+        return cls.__curr_window_type
+    
+    def get_window_state(cls):
+        return cls.__window_enable
     def plot_time_domain(cls):
 
         plt.figure()
