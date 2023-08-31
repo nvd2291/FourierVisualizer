@@ -170,6 +170,13 @@ class FourierDataObject():
             cls.__signal_data -= cls.__dc_offset
             cls.__dc_offset = offset
             cls.__signal_data += offset
+    
+    def set_frequency(cls, frequencyVal):
+        if frequencyVal > 0:
+            cls.__signal_frequency = frequencyVal
+    
+    def generate_time_axis(cls):
+        cls.__time_axis_data = np.linspace(cls.__start_time, cls.__end_time, cls.__num_samples)
 
     def generate_time_domain_data(cls, signal_type: Optional[str] = None):
         """
@@ -181,7 +188,7 @@ class FourierDataObject():
         cls.calc_sample_period()
         cls.calc_num_samples()
 
-        cls.__time_axis_data = np.linspace(cls.__start_time, cls.__end_time, cls.__num_samples)
+        cls.generate_time_axis()
 
         if cls.__curr_sig_type == 'sine':
             yAxis = np.sin(2 * np.pi * cls.__signal_frequency * cls.__time_axis_data)
@@ -218,15 +225,12 @@ class FourierDataObject():
             cls.__max_noise = noise_magnitude
         if with_noise is not None:
             cls.__noise_enable = with_noise
-            if with_noise:
-                cls.generate_noise_data()
+
         cls.calc_sample_period()
         cls.calc_num_samples()
 
         four_over_pi = 4 / np.pi
-        cls.__time_axis_data = np.linspace(cls.__start_time, 
-                                           cls.__end_time, 
-                                           cls.__num_samples)
+        cls.generate_time_axis()
 
         sq_wave = np.zeros(len(cls.__time_axis_data))
         for n in range(1, (harmonics * 2 + 1), 2):
@@ -260,14 +264,12 @@ class FourierDataObject():
             cls.__max_noise = noise_magnitude
         if with_noise is not None:
             cls.__noise_enable = with_noise
-            if with_noise:
-                cls.generate_noise_data()
 
         cls.calc_sample_period()
         cls.calc_num_samples()
         pi_squared_div_8 = (np.pi ** 2) / 8 
 
-        cls.__time_axis_data = np.linspace(cls.__start_time, cls.__end_time, cls.__num_samples)
+        cls.generate_time_axis()
         triangle_wave = np.zeros(len(cls.__time_axis_data))
 
         # Only sum odd number of harmonics
@@ -361,7 +363,7 @@ class FourierDataObject():
 
     def get_fft_domain_data(cls):
         return [cls.__fft_bins, cls.__fft_magnitude]
-        
+
     def plot_time_domain(cls):
 
         plt.figure()

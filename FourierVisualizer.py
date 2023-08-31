@@ -36,6 +36,32 @@ def isEntryNumerical(event):
             return
             
         messagebox.showerror(title = "Input Error", message = "Only Float/Integer Values Accepted")
+
+def generate_data():
+    signalType = sigTypesCombo.current()
+
+    numHarmonics = int(harmonicsEntry.get())
+
+    if noiseTypesCombo.get() == "None":
+        thisFourier.disable_noise()
+    else:
+        thisFourier.enable_noise()
+        noiseVal = float(noiseEntry.get())
+        thisFourier.generate_noise_data(noiseTypesCombo.get().lower(), noiseVal)
+
+
+    fourierObj.set_amplitude(float(amplitudeEntry.get()))
+    fourierObj.set_offset(float(offsetEntry.get()))
+    fourierObj.set_frequency(float(frequencyEntry.get()) * 1e3)
+
+    if signalType >= 0 and signalType < 4:
+        fourierObj.generate_time_domain_data(sigTypesCombo.get())
+    elif signalType == 4:
+        fourierObj.construct_square_wave_from_sines(numHarmonics)
+    elif signalType == 5:
+        fourierObj.construct_triangle_wave_from_sines(numHarmonics)
+
+    fourierObj.generate_freq_domain_data()
     
 #Initialize the FourierObject
 thisFourier = fourierObj.FourierDataObject()
@@ -44,12 +70,10 @@ window = tk.Tk()
 # window.geometry("1200x1000")
 window.title("Fourier Visualizer Tool")
 
-
 #Create the OptionsFrame
 optionsFrame = ttk.Frame(window, height = 800, width = 200)
 optionsFrame['borderwidth'] = 5
 optionsFrame['relief'] = 'groove'
-
 
 optionsFrameLabel = ttk.Label(optionsFrame, text = "Signal Options", font = 'Arial 24')
 optionsFrameLabel.grid(row = 0, columnspan =2 , padx = 10, pady = 10)
@@ -160,9 +184,8 @@ displayFrameLabel.grid(row = 0, column = 0, padx = 10, pady = 10)
 fig, ax = plt.subplots()
 dataCanvas = FigureCanvasTkAgg(fig, master = displayFrame)
 dataCanvas.get_tk_widget().grid(row = 1, padx = 10, pady = 10)
-thisFourier.construct_square_wave_from_sines(7)
 
 displayFrame.pack(side = 'right', padx = 10, pady = 10)
 
-
+generate_data()
 window.mainloop()
