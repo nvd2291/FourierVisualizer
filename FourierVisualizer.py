@@ -50,18 +50,18 @@ def generate_data():
         thisFourier.generate_noise_data(noiseTypesCombo.get().lower(), noiseVal)
 
 
-    fourierObj.set_amplitude(float(amplitudeEntry.get()))
-    fourierObj.set_offset(float(offsetEntry.get()))
-    fourierObj.set_frequency(float(frequencyEntry.get()) * 1e3)
+    thisFourier.set_amplitude(float(amplitudeEntry.get()))
+    thisFourier.set_offset(float(offsetEntry.get()))
+    thisFourier.set_frequency(float(frequencyEntry.get()) * 1e3)
 
     if signalType >= 0 and signalType < 4:
-        fourierObj.generate_time_domain_data(sigTypesCombo.get())
+        thisFourier.generate_time_domain_data(sigTypesCombo.get())
     elif signalType == 4:
-        fourierObj.construct_square_wave_from_sines(numHarmonics)
+        thisFourier.construct_square_wave_from_sines(numHarmonics)
     elif signalType == 5:
-        fourierObj.construct_triangle_wave_from_sines(numHarmonics)
+        thisFourier.construct_triangle_wave_from_sines(numHarmonics)
 
-    fourierObj.generate_freq_domain_data()
+    thisFourier.generate_freq_domain_data()
     
 #Initialize the FourierObject
 thisFourier = fourierObj.FourierDataObject()
