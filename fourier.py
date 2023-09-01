@@ -265,24 +265,24 @@ class FourierDataObject():
         if with_noise is not None:
             cls.__noise_enable = with_noise
 
+        print(f"Amplitude inside fourier.py is {cls.__amplitude}")
         cls.calc_sample_period()
         cls.calc_num_samples()
-        pi_squared_div_8 = (np.pi ** 2) / 8 
-
         cls.generate_time_axis()
+
+        scaling_factor = (8 / (np.pi ** 2)) * cls.__amplitude
         triangle_wave = np.zeros(len(cls.__time_axis_data))
 
         # Only sum odd number of harmonics
         for n in range(1, (harmonics * 2 + 1), 2):
-            triangle_wave += (pi_squared_div_8 * ((-1) ** ((n - 1)/ 2)) * 
+            triangle_wave += (scaling_factor * ((-1) ** ((n - 1)/ 2)) * 
                               (1 / (n ** 2)) * 
                               np.sin(2 * np.pi * 
                               cls.__signal_frequency * 
                               cls.__time_axis_data * n))
 
-        cls.__signal_data = triangle_wave * cls.__amplitude
-        
-        cls.__signal_data += cls.__dc_offset
+        cls.__signal_data = triangle_wave + cls.__dc_offset
+
 
         if cls.__noise_enable:
             cls.generate_noise_data()

@@ -49,7 +49,6 @@ def generate_data():
         noiseVal = float(noiseEntry.get())
         thisFourier.generate_noise_data(noiseTypesCombo.get().lower(), noiseVal)
 
-
     thisFourier.set_amplitude(float(amplitudeEntry.get()))
     thisFourier.set_offset(float(offsetEntry.get()))
     thisFourier.set_frequency((float(frequencyEntry.get()) * 1e3))
@@ -94,9 +93,6 @@ def plot_data():
 
     dataCanvas.draw()
 
-    
-
-
 #Initialize the FourierObject
 thisFourier = fourierObj.FourierDataObject()
 # Create the tkinter Window
@@ -112,13 +108,13 @@ optionsFrame['borderwidth'] = 5
 optionsFrame['relief'] = 'groove'
 
 optionsFrameLabel = ttk.Label(optionsFrame, text = "Signal Options", font = 'Arial 24')
-optionsFrameLabel.grid(row = 0, columnspan =2 , padx = 10, pady = 10)
+optionsFrameLabel.grid(row = 0, column = 0 , padx = 10, pady = 10)
 
 #Create the Signal Types Drop Down 
 sigTypeLabel = ttk.Label(optionsFrame, text = "Signal Type: ")
 sigTypeLabel.grid(row = 1, column = 0, padx = 10, pady = 10)
 
-sigTypesCombo = ttk.Combobox(optionsFrame)
+sigTypesCombo = ttk.Combobox(optionsFrame, state = 'readonly')
 sigTypesCombo['values'] = ["Sine", "Square", "Sawtooth", "Triangle", "Sine-Constructed Square Wave", "Sine-Constructed Triangle Wave"]
 sigTypesCombo.current(0)
 sigTypesCombo.grid(row = 1, column= 1, padx = 10, pady = 10)
@@ -127,7 +123,7 @@ sigTypesCombo.grid(row = 1, column= 1, padx = 10, pady = 10)
 fftTypeLabel = ttk.Label(optionsFrame, text = "FFT Window: ")
 fftTypeLabel.grid(row = 2, column = 0, padx = 10, pady = 5)
 
-fftWindowsCombo = ttk.Combobox(optionsFrame)
+fftWindowsCombo = ttk.Combobox(optionsFrame, state = 'readonly')
 fftWindowsCombo['values'] = [windowName.capitalize() for windowName in thisFourier.get_window_types()]
 fftWindowsCombo.current(5)
 fftWindowsCombo.grid(row = 2, column = 1, padx = 10, pady = 5)
@@ -137,7 +133,7 @@ fftWindowsCombo.grid(row = 2, column = 1, padx = 10, pady = 5)
 noiseTypesLabel = ttk.Label(optionsFrame, text = "Noise Type: ")
 noiseTypesLabel.grid(row = 3, column = 0, padx = 10, pady = 5)
 
-noiseTypesCombo = ttk.Combobox(optionsFrame)
+noiseTypesCombo = ttk.Combobox(optionsFrame, state = 'readonly')
 noiseTypesCombo['value'] = ("None",) + thisFourier.get_noise_types()
 noiseTypesCombo.current(0)
 noiseTypesCombo.grid(row = 3, column = 1, padx = 10, pady = 10)
@@ -186,7 +182,7 @@ frequencyLabel = ttk.Label(optionsFrame, text = "Frequency [kHz]: ")
 frequencyLabel.grid(row = 7, column = 0, padx = 10, pady= 10)
 
 frequencyText = tk.StringVar()
-frequencyText.set("0.01")
+frequencyText.set("10.0")
 
 frequencyEntry = ttk.Entry(optionsFrame, textvariable = frequencyText)
 frequencyEntry.bind('<Return>', isEntryNumerical)
@@ -199,7 +195,7 @@ harmonicsLabel = ttk.Label(optionsFrame, text = "Harmonics: ")
 harmonicsLabel.grid(row = 8, column = 0, padx = 10, pady= 10)
 
 harmonicsText = tk.StringVar()
-harmonicsText.set("1")
+harmonicsText.set("7")
 
 harmonicsEntry = ttk.Entry(optionsFrame, textvariable = harmonicsText)
 harmonicsEntry.bind('<Return>', isEntryNumerical)
@@ -207,7 +203,7 @@ harmonicsEntry.bind('<FocusOut>', isEntryNumerical)
 harmonicsEntry.name = "harmonics"
 harmonicsEntry.grid(row = 8, column = 1, padx = 10, pady= 10)
 
-optionsFrame.pack(side = 'left', padx = 10, pady = 10, expand = True, fill = "both")
+optionsFrame.pack(side = 'left', padx = 10, pady = 10, expand = True, fill = 'y', anchor = 'w')
 
 #Setup the display frame
 displayFrame = ttk.Frame(window, height =  window.winfo_height() - 20, width = window.winfo_width() - 20)
@@ -220,6 +216,10 @@ displayFrameLabel.grid(row = 0, column = 0, padx = 10, pady = 10, sticky = 'n')
 fig, ax = plt.subplots(2, 1)
 dataCanvas = FigureCanvasTkAgg(fig, master = displayFrame)
 dataCanvas.get_tk_widget().grid(row = 1, padx = 10, pady = 10, stick = 'nsew')
+
+toolbar = NavigationToolbar2Tk(dataCanvas, displayFrame, pack_toolbar = False)
+toolbar.update()
+toolbar.grid(row = 3, column = 0, sticky = 'ew')
 
 displayFrame.grid_columnconfigure(0, weight = 1)
 displayFrame.grid_rowconfigure(1 , weight = 1)
