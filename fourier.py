@@ -240,9 +240,7 @@ class FourierDataObject():
                         cls.__signal_frequency * 
                         cls.__time_axis_data)))
 
-        cls.__signal_data = sq_wave * cls.__amplitude
-
-        cls.__signal_data += cls.__dc_offset
+        cls.__signal_data = (sq_wave * cls.__amplitude) + cls.__dc_offset
         
         if cls.__noise_enable == True:
             cls.generate_noise_data()

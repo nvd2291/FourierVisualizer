@@ -29,6 +29,9 @@ def isEntryNumerical(event):
         elif(event.widget.name == "frequency"):
             event.widget.delete(0,tk.END)
             event.widget.insert(0, "20")
+        elif(event.widget.name == "numPeriods"):
+            event.widget.delete(0,tk.END)
+            event.widget.insert(0, "10")
         elif(event.widget.name == "harmonics"):
             event.widget.delete(0,tk.END)
             event.widget.insert(0, "1")
@@ -49,6 +52,11 @@ def generate_data():
         noiseVal = float(noiseEntry.get())
         thisFourier.generate_noise_data(noiseTypesCombo.get().lower(), noiseVal)
 
+    if fftWindowsCombo.get() == "None":
+        thisFourier.disable_window()
+    else:
+        thisFourier.set_window_type(fftWindowsCombo.get())
+        thisFourier.enable_window()
     thisFourier.set_amplitude(float(amplitudeEntry.get()))
     thisFourier.set_offset(float(offsetEntry.get()))
     thisFourier.set_frequency((float(frequencyEntry.get()) * 1e3))
@@ -62,6 +70,14 @@ def generate_data():
 
     thisFourier.generate_freq_domain_data()
 
+def get_display_limits():
+    signal_frequency = thisFourier.get_freq()
+    min_time = 0
+    numPeriodsFloat = float(numPeriodsEntry.get())
+    max_time = (1/signal_frequency) * numPeriodsFloat
+    return [min_time, max_time]
+
+
 def plot_data():
     generate_data()
     [time_axis, signal_data] = thisFourier.get_time_domain_data()
@@ -69,14 +85,15 @@ def plot_data():
 
     frequency = thisFourier.get_freq()
     fs = thisFourier.get_fs()
-    amplitude = thisFourier.get_amplitude()
+    amplitude = abs(signal_data.min() - signal_data.max()) / 2
     window_name  = thisFourier.get_window_type().capitalize()
     ax[0].clear()
     ax[1].clear()
 
+    [min_time, max_time] = get_display_limits()
     ax[0].plot(time_axis, signal_data)
     ax[0].set_title(f"Time Domain Data: Frequency: {frequency}kHz, Sampling Frequency: {fs}kHz, Amplitude: {amplitude}")
-    ax[0].set_xlim(min(time_axis), max(time_axis))
+    ax[0].set_xlim(min_time, max_time)
     ax[0].set_ylabel('Units')
     ax[0].set_xlabel('Seconds')
     ax[0].grid(True, 'both')
@@ -97,7 +114,7 @@ def plot_data():
 thisFourier = fourierObj.FourierDataObject()
 # Create the tkinter Window
 window = tk.Tk()
-# window.geometry("1200x1000")
+# window.geometry("2560x1440")
 window.title("Fourier Visualizer Tool")
 window.grid_columnconfigure(0, weight = 1)
 window.grid_rowconfigure(0, weight = 0)
@@ -124,8 +141,8 @@ fftTypeLabel = ttk.Label(optionsFrame, text = "FFT Window: ")
 fftTypeLabel.grid(row = 2, column = 0, padx = 10, pady = 5)
 
 fftWindowsCombo = ttk.Combobox(optionsFrame, state = 'readonly')
-fftWindowsCombo['values'] = [windowName.capitalize() for windowName in thisFourier.get_window_types()]
-fftWindowsCombo.current(5)
+fftWindowsCombo['values'] = ["None"] + [windowName.capitalize() for windowName in thisFourier.get_window_types()]
+fftWindowsCombo.current(6)
 fftWindowsCombo.grid(row = 2, column = 1, padx = 10, pady = 5)
 
 #Create the Noise Types Drop Down
@@ -203,7 +220,20 @@ harmonicsEntry.bind('<FocusOut>', isEntryNumerical)
 harmonicsEntry.name = "harmonics"
 harmonicsEntry.grid(row = 8, column = 1, padx = 10, pady= 10)
 
-optionsFrame.pack(side = 'left', padx = 10, pady = 10, expand = True, fill = 'y', anchor = 'w')
+# Set up the Num periods to display
+numPeriodsLabel = ttk.Label(optionsFrame, text = "Number of Periods to Display: ")
+numPeriodsLabel.grid(row = 9, column = 0, padx = 10, pady = 10)
+
+numPeriodsText = tk.StringVar()
+numPeriodsText.set("10")
+
+numPeriodsEntry = ttk.Entry(optionsFrame, textvariable = numPeriodsText)
+numPeriodsEntry.bind('<Return>', isEntryNumerical)
+numPeriodsEntry.bind('<FocusOut>', isEntryNumerical)
+numPeriodsEntry.grid(row = 9, column = 1, padx = 10, pady= 10)
+numPeriodsEntry.name  = "numPeriods"
+#Pack the options Frame
+optionsFrame.pack(side = 'left', padx = 10, pady = 10, anchor = 'ne')
 
 #Setup the display frame
 displayFrame = ttk.Frame(window, height =  window.winfo_height() - 20, width = window.winfo_width() - 20)
@@ -226,5 +256,5 @@ displayFrame.grid_rowconfigure(1 , weight = 1)
 displayFrame.pack(side = 'right', padx = 10, pady = 10, expand = True, fill = "both")
 
 plotButton = ttk.Button(optionsFrame, text = "Generate Plot", command = plot_data)
-plotButton.grid(row = 9, columnspan = 2, padx = 10, pady = 10)
+plotButton.grid(row = 10, columnspan = 2, padx = 10, pady = 10)
 window.mainloop()
