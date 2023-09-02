@@ -57,6 +57,7 @@ def generate_data():
     else:
         thisFourier.set_window_type(fftWindowsCombo.get())
         thisFourier.enable_window()
+
     thisFourier.set_amplitude(float(amplitudeEntry.get()))
     thisFourier.set_offset(float(offsetEntry.get()))
     thisFourier.set_frequency((float(frequencyEntry.get()) * 1e3))
