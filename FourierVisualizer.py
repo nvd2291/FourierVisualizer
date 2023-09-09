@@ -84,8 +84,8 @@ def plot_data():
     [time_axis, signal_data] = thisFourier.get_time_domain_data()
     [fft_bins, fft_magnitude] = thisFourier.get_fft_domain_data()
 
-    frequency = thisFourier.get_freq()
-    fs = thisFourier.get_fs()
+    frequency = thisFourier.get_freq()/1e3
+    fs = thisFourier.get_fs()/1e3
     amplitude = abs(signal_data.min() - signal_data.max()) / 2
     window_name  = thisFourier.get_window_type().capitalize()
     ax[0].clear()
@@ -119,6 +119,7 @@ window = tk.Tk()
 window.title("Fourier Visualizer Tool")
 window.grid_columnconfigure(0, weight = 1)
 window.grid_rowconfigure(0, weight = 0)
+window.resizable(True, True)
 
 #Create the OptionsFrame
 optionsFrame = ttk.Frame(window, height = window.winfo_height() - 20, width = window.winfo_width() - 20)
@@ -126,7 +127,7 @@ optionsFrame['borderwidth'] = 5
 optionsFrame['relief'] = 'groove'
 
 optionsFrameLabel = ttk.Label(optionsFrame, text = "Signal Options", font = 'Arial 24')
-optionsFrameLabel.grid(row = 0, column = 0 , padx = 10, pady = 10)
+optionsFrameLabel.grid(row = 0, columnspan = 2 , padx = 10, pady = 10)
 
 #Create the Signal Types Drop Down 
 sigTypeLabel = ttk.Label(optionsFrame, text = "Signal Type: ")
