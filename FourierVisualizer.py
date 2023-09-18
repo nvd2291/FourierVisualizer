@@ -104,6 +104,7 @@ def plot_data():
         ax[1].set_title(f"FFT Plot: Frequency: {frequency}kHz, Sampling Frequency: {fs}KHz, FFT Window: {window_name}")
     else:
         ax[1].set_title(f"FFT Plot: Frequency: {frequency}kHz, Sampling Frequency: {fs}KHz, FFT Window: No Window")
+
     ax[1].set_xlim(min(fft_bins), max(fft_bins))
     ax[1].set_ylabel('Magnitude [dBFS]')
     ax[1].set_xlabel('Frequency [Hz]')
@@ -121,45 +122,47 @@ window.grid_columnconfigure(0, weight = 1)
 window.grid_rowconfigure(0, weight = 0)
 window.resizable(True, True)
 
+xpad, ypad = 10, 10
+
 #Create the OptionsFrame
 optionsFrame = ttk.Frame(window, height = window.winfo_height() - 20, width = window.winfo_width() - 20)
 optionsFrame['borderwidth'] = 5
 optionsFrame['relief'] = 'groove'
 
-optionsFrameLabel = ttk.Label(optionsFrame, text = "Signal Options", font = 'Arial 24')
-optionsFrameLabel.grid(row = 0, columnspan = 2 , padx = 10, pady = 10)
+optionsFrameLabel = ttk.Label(optionsFrame, text = "Signal Options", font = 'Helvetica')
+optionsFrameLabel.grid(row = 0, columnspan = 2 , padx = xpad, pady = ypad)
 
 #Create the Signal Types Drop Down 
 sigTypeLabel = ttk.Label(optionsFrame, text = "Signal Type: ")
-sigTypeLabel.grid(row = 1, column = 0, padx = 10, pady = 10)
+sigTypeLabel.grid(row = 1, column = 0, padx = xpad, pady = ypad)
 
 sigTypesCombo = ttk.Combobox(optionsFrame, state = 'readonly')
 sigTypesCombo['values'] = ["Sine", "Square", "Sawtooth", "Triangle", "Sine-Constructed Square Wave", "Sine-Constructed Triangle Wave"]
 sigTypesCombo.current(0)
-sigTypesCombo.grid(row = 1, column= 1, padx = 10, pady = 10)
+sigTypesCombo.grid(row = 1, column= 1, padx = xpad, pady = ypad)
 
 #Create the FFT Windows Drop Down 
 fftTypeLabel = ttk.Label(optionsFrame, text = "FFT Window: ")
-fftTypeLabel.grid(row = 2, column = 0, padx = 10, pady = 5)
+fftTypeLabel.grid(row = 2, column = 0, padx = xpad, pady = 5)
 
 fftWindowsCombo = ttk.Combobox(optionsFrame, state = 'readonly')
 fftWindowsCombo['values'] = ["None"] + [windowName.capitalize() for windowName in thisFourier.get_window_types()]
 fftWindowsCombo.current(6)
-fftWindowsCombo.grid(row = 2, column = 1, padx = 10, pady = 5)
+fftWindowsCombo.grid(row = 2, column = 1, padx = xpad, pady = 5)
 
 #Create the Noise Types Drop Down
 
 noiseTypesLabel = ttk.Label(optionsFrame, text = "Noise Type: ")
-noiseTypesLabel.grid(row = 3, column = 0, padx = 10, pady = 5)
+noiseTypesLabel.grid(row = 3, column = 0, padx = xpad, pady = 5)
 
 noiseTypesCombo = ttk.Combobox(optionsFrame, state = 'readonly')
 noiseTypesCombo['value'] = ("None",) + thisFourier.get_noise_types()
 noiseTypesCombo.current(0)
-noiseTypesCombo.grid(row = 3, column = 1, padx = 10, pady = 10)
+noiseTypesCombo.grid(row = 3, column = 1, padx = xpad, pady = ypad)
 
 # Set up the Amplitude Text Entry Box
 offsetLabel = ttk.Label(optionsFrame, text = "Offset Value: ")
-offsetLabel.grid(row = 4, column = 0, padx = 10, pady= 10)
+offsetLabel.grid(row = 4, column = 0, padx = xpad, pady= 10)
 
 offsetText = tk.StringVar()
 offsetText.set("0.0")
@@ -168,11 +171,11 @@ offsetEntry = ttk.Entry(optionsFrame, textvariable = offsetText)
 offsetEntry.bind('<Return>', isEntryNumerical)
 offsetEntry.bind('<FocusOut>', isEntryNumerical)
 offsetEntry.name = "offset"
-offsetEntry.grid(row = 4, column = 1, padx = 10, pady= 10)
+offsetEntry.grid(row = 4, column = 1, padx = xpad, pady= 10)
 
 # Set up the Amplitude Text Entry Box
 amplitudeLabel = ttk.Label(optionsFrame, text = "Amplitude Value: ")
-amplitudeLabel.grid(row = 5, column = 0, padx = 10, pady= 10)
+amplitudeLabel.grid(row = 5, column = 0, padx = xpad, pady= 10)
 
 amplitudeText = tk.StringVar()
 amplitudeText.set("1.0")
@@ -181,11 +184,11 @@ amplitudeEntry = ttk.Entry(optionsFrame, textvariable = amplitudeText)
 amplitudeEntry.bind('<Return>', isEntryNumerical)
 amplitudeEntry.bind('<FocusOut>', isEntryNumerical)
 amplitudeEntry.name = "amplitude"
-amplitudeEntry.grid(row = 5, column = 1, padx = 10, pady= 10)
+amplitudeEntry.grid(row = 5, column = 1, padx = xpad, pady= 10)
 
 # Set up the Noise Magnitude Text Entry Box
 noiseLabel = ttk.Label(optionsFrame, text = "Noise Magnitude: ")
-noiseLabel.grid(row = 6, column = 0, padx = 10, pady= 10)
+noiseLabel.grid(row = 6, column = 0, padx = xpad, pady= 10)
 
 noiseText = tk.StringVar()
 noiseText.set("0.01")
@@ -194,11 +197,11 @@ noiseEntry = ttk.Entry(optionsFrame, textvariable = noiseText)
 noiseEntry.bind('<Return>', isEntryNumerical)
 noiseEntry.bind('<FocusOut>', isEntryNumerical)
 noiseEntry.name = "noise"
-noiseEntry.grid(row = 6, column = 1, padx = 10, pady= 10)
+noiseEntry.grid(row = 6, column = 1, padx = xpad, pady= 10)
 
 # Set up the Frequency Text Entry Box
 frequencyLabel = ttk.Label(optionsFrame, text = "Frequency [kHz]: ")
-frequencyLabel.grid(row = 7, column = 0, padx = 10, pady= 10)
+frequencyLabel.grid(row = 7, column = 0, padx = xpad, pady= 10)
 
 frequencyText = tk.StringVar()
 frequencyText.set("10.0")
@@ -207,11 +210,11 @@ frequencyEntry = ttk.Entry(optionsFrame, textvariable = frequencyText)
 frequencyEntry.bind('<Return>', isEntryNumerical)
 frequencyEntry.bind('<FocusOut>', isEntryNumerical)
 frequencyEntry.name = "frequency"
-frequencyEntry.grid(row = 7, column = 1, padx = 10, pady= 10)
+frequencyEntry.grid(row = 7, column = 1, padx = xpad, pady= 10)
 
 # Set up the Harmonics Text Entry Box
 harmonicsLabel = ttk.Label(optionsFrame, text = "Harmonics: ")
-harmonicsLabel.grid(row = 8, column = 0, padx = 10, pady= 10)
+harmonicsLabel.grid(row = 8, column = 0, padx = xpad, pady= 10)
 
 harmonicsText = tk.StringVar()
 harmonicsText.set("7")
@@ -220,11 +223,11 @@ harmonicsEntry = ttk.Entry(optionsFrame, textvariable = harmonicsText)
 harmonicsEntry.bind('<Return>', isEntryNumerical)
 harmonicsEntry.bind('<FocusOut>', isEntryNumerical)
 harmonicsEntry.name = "harmonics"
-harmonicsEntry.grid(row = 8, column = 1, padx = 10, pady= 10)
+harmonicsEntry.grid(row = 8, column = 1, padx = xpad, pady= 10)
 
 # Set up the Num periods to display
 numPeriodsLabel = ttk.Label(optionsFrame, text = "Number of Periods to Display: ")
-numPeriodsLabel.grid(row = 9, column = 0, padx = 10, pady = 10)
+numPeriodsLabel.grid(row = 9, column = 0, padx = xpad, pady = ypad)
 
 numPeriodsText = tk.StringVar()
 numPeriodsText.set("10")
@@ -232,22 +235,22 @@ numPeriodsText.set("10")
 numPeriodsEntry = ttk.Entry(optionsFrame, textvariable = numPeriodsText)
 numPeriodsEntry.bind('<Return>', isEntryNumerical)
 numPeriodsEntry.bind('<FocusOut>', isEntryNumerical)
-numPeriodsEntry.grid(row = 9, column = 1, padx = 10, pady= 10)
+numPeriodsEntry.grid(row = 9, column = 1, padx = xpad, pady= 10)
 numPeriodsEntry.name  = "numPeriods"
 #Pack the options Frame
-optionsFrame.pack(side = 'left', padx = 10, pady = 10, anchor = 'ne')
+optionsFrame.pack(side = 'left', padx = xpad, pady = ypad, anchor = 'ne')
 
 #Setup the display frame
 displayFrame = ttk.Frame(window, height =  window.winfo_height() - 20, width = window.winfo_width() - 20)
 displayFrame['borderwidth'] = 5
 displayFrame['relief'] = 'groove'
 
-displayFrameLabel = ttk.Label(displayFrame, text = "Signal Data", font = "Helvetica 24")
-displayFrameLabel.grid(row = 0, column = 0, padx = 10, pady = 10, sticky = 'n')
+displayFrameLabel = ttk.Label(displayFrame, text = "Signal Data", font = "Helvetica")
+displayFrameLabel.grid(row = 0, column = 0, padx = xpad, pady = ypad, sticky = 'n')
 
 fig, ax = plt.subplots(2, 1)
 dataCanvas = FigureCanvasTkAgg(fig, master = displayFrame)
-dataCanvas.get_tk_widget().grid(row = 1, padx = 10, pady = 10, stick = 'nsew')
+dataCanvas.get_tk_widget().grid(row = 1, padx = xpad, pady = ypad, stick = 'nsew')
 
 toolbar = NavigationToolbar2Tk(dataCanvas, displayFrame, pack_toolbar = False)
 toolbar.update()
@@ -255,8 +258,8 @@ toolbar.grid(row = 3, column = 0, sticky = 'ew')
 
 displayFrame.grid_columnconfigure(0, weight = 1)
 displayFrame.grid_rowconfigure(1 , weight = 1)
-displayFrame.pack(side = 'right', padx = 10, pady = 10, expand = True, fill = "both")
+displayFrame.pack(side = 'right', padx = xpad, pady = ypad, expand = True, fill = "both")
 
 plotButton = ttk.Button(optionsFrame, text = "Generate Plot", command = plot_data)
-plotButton.grid(row = 10, columnspan = 2, padx = 10, pady = 10)
+plotButton.grid(row = 10, columnspan = 2, padx = xpad, pady = ypad)
 window.mainloop()
